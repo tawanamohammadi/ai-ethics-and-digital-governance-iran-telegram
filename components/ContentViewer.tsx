@@ -1,34 +1,36 @@
-// FIX: Replaced placeholder content with a full ContentViewer component implementation.
 import React from 'react';
 import { File } from '../types';
-import MarkdownRenderer from './MarkdownRenderer';
-import { FileIcon } from './icons';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface ContentViewerProps {
-  file: File;
+  file: File | null;
 }
 
-const ContentViewer: React.FC<ContentViewerProps> = ({ file }) => {
+export const ContentViewer: React.FC<ContentViewerProps> = ({ file }) => {
+  if (!file) {
+    return (
+        <div className="flex items-center justify-center h-full text-slate-500">
+            <p>Select a file from the navigation panel to view its content.</p>
+        </div>
+    );
+  }
+
   const isMarkdown = file.name.endsWith('.md');
-  const isCode = /\.(tsx|ts|js|json|css)$/.test(file.name);
 
   return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-lg h-full flex flex-col">
-       <header className="flex items-center p-3 border-b border-[#30363d] bg-[#0d1117] rounded-t-lg shrink-0">
-         <FileIcon className="w-5 h-5 mr-3 text-gray-400" />
-         <h2 className="text-lg font-medium text-white">{file.name}</h2>
-       </header>
-       <div className="p-6 overflow-y-auto flex-1">
+    <div className="h-full">
         {isMarkdown ? (
-          <MarkdownRenderer content={file.content} />
+             <div className="prose prose-invert prose-lg max-w-4xl mx-auto">
+                <MarkdownRenderer content={file.content} />
+             </div>
         ) : (
-          <pre className={`text-sm whitespace-pre-wrap break-words ${isCode ? 'language-js' : ''}`}>
-            <code>{file.content}</code>
-          </pre>
+            <div className="bg-slate-800 rounded-lg p-4 h-full overflow-auto">
+                 <h2 className="text-lg font-bold text-slate-300 border-b border-slate-600 pb-2 mb-4">{file.name}</h2>
+                 <pre className="text-sm text-slate-300 whitespace-pre-wrap break-all font-mono">
+                    <code>{file.content}</code>
+                </pre>
+            </div>
         )}
-       </div>
     </div>
   );
 };
-
-export default ContentViewer;
