@@ -1,0 +1,5 @@
+{
+  "name": "AI Research Project Viewer",
+  "description": "A web application to browse the file structure and content of the 'From AI Ethics to Platform Governance' research project. It features a beautiful, research-oriented user interface and is designed for static deployment.",
+  "requestFramePermissions": []
+}
