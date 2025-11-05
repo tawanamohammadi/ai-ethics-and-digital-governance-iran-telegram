@@ -14,8 +14,8 @@
     <!-- Favicon (SVG Data URI to prevent 404) -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Crect%20width='16'%20height='16'%20fill='%23334155'/%3E%3Ctext%20x='4'%20y='12'%20font-family='sans-serif'%20font-size='10'%20fill='white'%3ER%3C/text%3E%3C/svg%3E">
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Tailwind CSS CDN (must load before the config script) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +34,7 @@
 </script>
     <script>
       // Custom Tailwind config to add the project's fonts
+      // This script now runs AFTER the CDN script has loaded the 'tailwind' object.
       tailwind.config = {
         theme: {
           extend: {
