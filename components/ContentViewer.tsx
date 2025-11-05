@@ -1,40 +1,34 @@
-
+// FIX: Replaced placeholder content with a full ContentViewer component implementation.
 import React from 'react';
 import { File } from '../types';
-import { MarkdownRenderer } from './MarkdownRenderer';
+import MarkdownRenderer from './MarkdownRenderer';
+import { FileIcon } from './icons';
 
 interface ContentViewerProps {
-  file: File | null;
+  file: File;
 }
 
-export const ContentViewer: React.FC<ContentViewerProps> = ({ file }) => {
-  if (!file) {
-    return (
-      <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700 h-full flex items-center justify-center">
-        <p className="text-slate-400">Select a file to view its content.</p>
-      </div>
-    );
-  }
-
+const ContentViewer: React.FC<ContentViewerProps> = ({ file }) => {
   const isMarkdown = file.name.endsWith('.md');
-  const isImage = /\.(jpg|jpeg|png|gif|svg)$/i.test(file.name);
+  const isCode = /\.(tsx|ts|js|json|css)$/.test(file.name);
 
   return (
-    <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden" style={{minHeight: 'calc(100vh - 10rem)'}}>
-      <div className="bg-slate-800 p-3 border-b border-slate-700">
-        <h3 className="font-mono text-sm text-slate-200">{file.name}</h3>
-      </div>
-      <div className="p-4 sm:p-6 lg:p-8 overflow-auto">
+    <div className="bg-[#161b22] border border-[#30363d] rounded-lg h-full flex flex-col">
+       <header className="flex items-center p-3 border-b border-[#30363d] bg-[#0d1117] rounded-t-lg shrink-0">
+         <FileIcon className="w-5 h-5 mr-3 text-gray-400" />
+         <h2 className="text-lg font-medium text-white">{file.name}</h2>
+       </header>
+       <div className="p-6 overflow-y-auto flex-1">
         {isMarkdown ? (
           <MarkdownRenderer content={file.content} />
-        ) : isImage ? (
-           <img src={file.content} alt={file.name} className="max-w-full rounded" />
         ) : (
-          <pre className="whitespace-pre-wrap break-words font-mono text-sm text-slate-300">
+          <pre className={`text-sm whitespace-pre-wrap break-words ${isCode ? 'language-js' : ''}`}>
             <code>{file.content}</code>
           </pre>
         )}
-      </div>
+       </div>
     </div>
   );
 };
+
+export default ContentViewer;

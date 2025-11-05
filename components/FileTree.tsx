@@ -1,96 +1,75 @@
-
+// FIX: Replaced placeholder content with a full FileTree component implementation.
 import React, { useState } from 'react';
-import { FileSystemNode, File } from '../types';
-import { FolderIcon, FileIcon, ChevronRightIcon, ChevronDownIcon } from './icons';
+import { FileSystemNode, File, Folder } from '../types';
+import { FileIcon, FolderIcon, ChevronDownIcon, ChevronRightIcon } from './icons';
 
 interface FileTreeProps {
-  nodes: FileSystemNode[];
-  onFileSelect: (file: File) => void;
-  selectedFileName: string;
+  data: FileSystemNode[];
+  onFileSelect: (node: FileSystemNode) => void;
+  selectedFile: File | null;
   level?: number;
 }
 
-const TreeNode: React.FC<{
-  node: FileSystemNode;
-  onFileSelect: (file: File) => void;
-  selectedFileName: string;
-  level: number;
-}> = ({ node, onFileSelect, selectedFileName, level }) => {
-  const [isOpen, setIsOpen] = useState(level === 0);
-
-  const isSelected = node.type === 'file' && node.name === selectedFileName;
-
-  const handleToggle = () => {
-    if (node.type === 'folder') {
-      setIsOpen(!isOpen);
-    }
-  };
-
-  const handleSelect = () => {
-    if (node.type === 'file') {
-      onFileSelect(node);
-    } else {
-      handleToggle();
-    }
-  };
-
-  const indentStyle = { paddingLeft: `${level * 1.25}rem` };
-
+const FileTree: React.FC<FileTreeProps> = ({ data, onFileSelect, selectedFile, level = 0 }) => {
   return (
-    <div>
-      <div
-        onClick={handleSelect}
-        className={`flex items-center p-2 rounded-md cursor-pointer transition-colors duration-150 ${
-          isSelected
-            ? 'bg-cyan-500/20 text-cyan-400'
-            : 'hover:bg-slate-700/50 text-slate-300'
-        }`}
-        style={indentStyle}
-      >
-        {node.type === 'folder' ? (
-          <div className="flex items-center w-full">
-            <span onClick={(e) => { e.stopPropagation(); handleToggle(); }} className="mr-1">
-              {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
-            </span>
-            <FolderIcon />
-            <span className="ml-2 font-medium">{node.name}</span>
-          </div>
-        ) : (
-          <div className="flex items-center w-full">
-            <FileIcon />
-            <span className="ml-2">{node.name}</span>
-          </div>
-        )}
-      </div>
-      {node.type === 'folder' && isOpen && (
-        <div>
-          {node.children.map((child, index) => (
-            <TreeNode
-              key={index}
-              node={child}
-              onFileSelect={onFileSelect}
-              selectedFileName={selectedFileName}
-              level={level + 1}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-export const FileTree: React.FC<FileTreeProps> = ({ nodes, onFileSelect, selectedFileName, level = 0 }) => {
-  return (
-    <div>
-      {nodes.map((node, index) => (
-        <TreeNode
-          key={index}
-          node={node}
-          onFileSelect={onFileSelect}
-          selectedFileName={selectedFileName}
-          level={level}
-        />
+    <ul className="space-y-1">
+      {data.map((node) => (
+        <li key={node.name}>
+          {node.type === 'folder' ? (
+            <FolderNode node={node} onFileSelect={onFileSelect} selectedFile={selectedFile} level={level} />
+          ) : (
+            <FileNode node={node} onFileSelect={onFileSelect} selectedFile={selectedFile} level={level} />
+          )}
+        </li>
       ))}
+    </ul>
+  );
+};
+
+interface NodeProps {
+  onFileSelect: (node: FileSystemNode) => void;
+  selectedFile: File | null;
+  level: number;
+}
+
+interface FileNodeProps extends NodeProps {
+  node: File;
+}
+
+const FileNode: React.FC<FileNodeProps> = ({ node, onFileSelect, selectedFile, level }) => {
+  const isSelected = selectedFile?.name === node.name && selectedFile?.content === node.content;
+  return (
+    <div
+      onClick={() => onFileSelect(node)}
+      className={`flex items-center py-1 cursor-pointer rounded hover:bg-[#21262d] ${isSelected ? 'bg-[#21262d] text-white' : ''}`}
+      style={{ paddingLeft: `${level * 20}px` }}
+    >
+      <FileIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+      <span>{node.name}</span>
     </div>
   );
 };
+
+interface FolderNodeProps extends NodeProps {
+  node: Folder;
+}
+
+const FolderNode: React.FC<FolderNodeProps> = ({ node, onFileSelect, selectedFile, level }) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div>
+      <div onClick={() => setIsOpen(!isOpen)} 
+        className="flex items-center py-1 cursor-pointer rounded hover:bg-[#21262d]"
+        style={{ paddingLeft: `${level * 20}px` }}
+      >
+        {isOpen ? <ChevronDownIcon className="w-4 h-4 mr-2 flex-shrink-0" /> : <ChevronRightIcon className="w-4 h-4 mr-2 flex-shrink-0" />}
+        <FolderIcon className="w-4 h-4 mr-2 flex-shrink-0 text-sky-400" />
+        <span className="font-medium">{node.name}</span>
+      </div>
+      {isOpen && <FileTree data={node.children} onFileSelect={onFileSelect} selectedFile={selectedFile} level={level + 1} />}
+    </div>
+  );
+};
+
+export default FileTree;

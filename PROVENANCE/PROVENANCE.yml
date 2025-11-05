@@ -1,0 +1,15 @@
+# Provenance Manifest
+# This file links datasets, AI outputs, and validation steps for reproducibility.
+
+- id: D001
+  description: "OSINT data on Babak Zanjani"
+  files:
+    - DATA/osint_babak_zanjani_1.ini
+    - DATA/osint_babak_zanjani_2.ini
+  status: "Validated"
+
+- id: A001
+  description: "AI-assisted literature review"
+  files:
+    - DATA/research_review_chatgpt5.ini
+  status: "Human-reviewed"
